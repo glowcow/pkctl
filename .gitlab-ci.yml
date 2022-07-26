@@ -16,4 +16,4 @@ Build binary package:
         - pip3 install -r requirements.txt
         - pyinstaller pkctl.py --onefile --name pkctl-$CI_COMMIT_TAG
     after_script:
-       - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file dist/pkctl-$CI_COMMIT_TAG "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/${CI_COMMIT_TAG}/pkctl-$CI_COMMIT_TAG"'
+       - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file dist/pkctl-$CI_COMMIT_TAG "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}/pkctl-$CI_COMMIT_TAG"'
