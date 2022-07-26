@@ -1,0 +1,2 @@
+kubernetes==24.2.0
+prettytable==3.3.0
