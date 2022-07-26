@@ -10,9 +10,10 @@ Build binary package:
         - when: never
     before_script:
         - pip3 install pyinstaller
-        - sed -i 's/version = .*/version = "${CI_COMMIT_TAG}"/' pkctl.py
+        - apt-get update && apt-get install binutils
+        - sed -i "s/version = .*/version = '$CI_COMMIT_TAG'/g" pkctl.py
         - cat pkctl.py
     script:
         - pip3 install -r requirements.txt
-        - pyinstaller pkctl.py --onefile --name pkctl-{$CI_COMMIT_TAG}
+        - pyinstaller pkctl.py --onefile --name pkctl-$CI_COMMIT_TAG
         - ls -al dist/
