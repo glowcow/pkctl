@@ -1,3 +1,6 @@
 #ignore dir
 **/__pycache__
+**/build
+**/dist
 #ignore files
+*.spec
