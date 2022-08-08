@@ -8,7 +8,8 @@ version = '0.1.0'
 
 if __name__ == "__main__":
     if com=='node':
-        node.resources(sys.argv[2])
+        r = node(sys.argv[2])
+        r.resources()
     elif com=='pods':
         pod.resources()
     elif com=='version':
