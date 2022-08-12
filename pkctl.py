@@ -8,10 +8,11 @@ version = '0.1.0'
 
 if __name__ == "__main__":
     if com=='node':
-        r = node(sys.argv[2])
-        r.resources()
+        ci = node(sys.argv[2])
+        ci.resources()
     elif com=='pods':
-        pod.resources()
+        ci = pod()
+        ci.resources()
     elif com=='version':
         print(f'{25*"-"}\nPyKubeCtl vesrion: {version}\n{25*"-"}')
     else:
