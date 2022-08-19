@@ -5,11 +5,11 @@
 
 1. Download binary
    ```bash
-   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.2.1/pkctl-0.2.1
+   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.3.0/pkctl-0.3.0
    ```
 2. Move to /usr/bin
    ```bash
-   sudo mv pkctl-0.2.1 /usr/bin/pkctl
+   sudo mv pkctl-0.3.0 /usr/bin/pkctl
    ```
 3. Allow to execute
    ```bash
@@ -23,7 +23,7 @@ pkctl version
 ```
 Listing all pods on all nodes:
 ```bash
-pkctl pods
+pkctl node all
 ```
 Listing all pods on specific node:
 ```bash
