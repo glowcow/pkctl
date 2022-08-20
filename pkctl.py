@@ -2,14 +2,20 @@
 from main.node import node
 import sys
 
-com = sys.argv[1]
 version = '0.1.0'
 
-if __name__ == "__main__":
-    if com=='node':
-        ci = node(sys.argv[2])
-        ci.resources()
-    elif com=='version':
-        print(f'{25*"-"}\nPyKubeCtl vesrion: {version}\n{25*"-"}')
+if __name__ == "__main__" :
+    if len(sys.argv) < 2:
+        sys.stderr.write(f'ERROR[main]: please specify command\n')
     else:
-        print(f'Unknown PyKubeCtl command: {com}')
+        com = sys.argv[1]
+        if com == 'node' :
+            try:
+                ci = node(sys.argv)
+                ci.resources()
+            except Exception as e:
+                sys.stderr.write(f'ERROR[main]: {e}\n')
+        elif com=='version':
+            print(f'{25*"-"}\nPyKubeCtl vesrion: {version}\n{25*"-"}')
+        else:
+            sys.stderr.write(f'ERROR[main]: Unknown PyKubeCtl command: {com}\n')
