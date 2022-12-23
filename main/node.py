@@ -201,7 +201,7 @@ class node:
                     n = a.metadata.name
                     nodes.append(n)
                 self.res_comp1(nodes, f_selector)
-            if self.node == "brief" :
+            elif self.node == "brief" :
                 node_list = kube_api.clnt.list_node()
                 nodes = []
                 for a in node_list.items:
