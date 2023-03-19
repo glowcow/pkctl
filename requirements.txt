@@ -1,2 +1,2 @@
-kubernetes==25.3.0
-prettytable==3.5.0
+kubernetes==26.1.0
+prettytable==3.6.0

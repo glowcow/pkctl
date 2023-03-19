@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 class bc:
     # Color
     BLACK = '\033[90m'

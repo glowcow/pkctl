@@ -1,23 +1,17 @@
-#!/bin/python3
+#!/usr/bin/env python3
+
 from main.colors import bc
 from main.api import kube_api
 from prettytable import PrettyTable
 import re, sys
 
-class node:
+class Node:
 
-    def __init__(self, argv):
-        if len(argv) == 3:
-            self.node = argv[2]
-            self.sort = "CPU"
-        elif len(argv) == 4:
-            self.node = argv[2]
-            if argv[3] == "mu" :
-                self.sort = "Mem(Mi)"
-            else:
-                raise NameError(f'Unknown PyKubeCtl sort mode: {argv[3]}')
+    def __init__(self, node, sort):
+        self.node = node
+        self.sort = "CPU" if sort == "CPU" else "Mem(Mi)"
 
-    def list_sum(self, lst):
+    def list_sum(self, lst): #summary various metrics
         _list = []
         cpu_list = []
         mem_list = []
@@ -45,7 +39,7 @@ class node:
             out = sum(_list)
         return out
 
-    def res_comp1(self, nodes, f_selector):
+    def res_comp1(self, nodes, f_selector): #compute resource for each nodes with pods
         n_cpu_a_l = []
         n_mem_a_l = []
         n_cpu_u_l = []
@@ -108,7 +102,7 @@ class node:
         print(f'| Overall running pods count: {bc.GREEN}{len(pods.items)}{bc.ENDC} (Err: {bc.RED}{len(err_pods)}{bc.ENDC})\n| Overall CPU usage: {bc.GREEN}{n_cpu_u}/{n_cpu_a} ({pc_cpu}%){bc.ENDC}\n| Total CPU Requests: {bc.YELLOW}{cpu_tr}/{n_cpu_a} ({pc_cpu_r}%){bc.ENDC}\n| Overall Memory usage: {bc.GREEN}{n_mem_u}Mi/{n_mem_a}Mi ({pc_mem}%){bc.ENDC}\n| Total Memory Requests: {bc.YELLOW}{mem_tr}Mi/{n_mem_a}Mi ({pc_mem_r}%){bc.ENDC}')
         print(t.get_string(sortby=self.sort, reversesort=True))
 
-    def res_comp2(self, nodes):
+    def res_comp2(self, nodes): #compute resource cluster wide
         t_pods_l = []
         t_err_pods_l = []
         t_ncpu_a_l = []
