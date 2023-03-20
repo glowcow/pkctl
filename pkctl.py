@@ -13,8 +13,7 @@ def main():
 
     node_parser = subparsers.add_parser("node", help="Get usage resources of kubernetes nodes")
     node_parser.add_argument("node", help="'node name', 'all' or 'brief'")
-    node_parser.add_argument("-s", "--sort", choices=["cpu", "mem"], default="cpu",
-                             help="Sort output by 'cpu' (default, cpu usage) or 'mem' (memory usage)")
+    node_parser.add_argument("-s", "--sort", choices=["cpu", "mem"], default="cpu", help="Sort output by 'cpu' (default, cpu usage) or 'mem' (memory usage)")
 
     pvc_parser = subparsers.add_parser("pvc", help="Get kubernetes PVC usage statistics")
     pvc_parser.add_argument("-n", "--namespace", help="List PVC in specific namespace")

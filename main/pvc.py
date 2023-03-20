@@ -4,11 +4,26 @@ from kubernetes import client, config
 from prettytable import PrettyTable
 from main.colors import bc
 from main.api import kube_api
-import json, subprocess
+import json, subprocess, re
 
 class KubernetesPVCUsage:
     def __init__(self, namespace=None):
         self.ns = namespace
+
+    def list_sum(self, lst): #summary various metrics
+        v_list = []
+        for a in lst:
+            if re.findall('Gi', a):
+                v_list.append(int(a.split('Gi')[0])*1024)
+            elif re.findall('Mi', a):
+                v_list.append(int(a.split('Mi')[0]))
+            elif re.findall('Ki', a):
+                v_list.append(int(a.split('Ki')[0])/1024)
+        if len(v_list) != 0 :
+            out = int(sum(v_list)) # in megabytes
+        else:
+            out = None
+        return out
 
     def list_pvc(self):
         pvc_list = []
@@ -53,12 +68,21 @@ class KubernetesPVCUsage:
     def get_usage(self):
         t = PrettyTable(['PVC', 'Volume', 'Namespace', 'Status', 'SC', 'Size', 'Usage'])
         a = self.list_pvc()
+        pvc_sum = []
         if a is not None:
             if self.ns is not None:
-                print(f"* {bc.BOLD}Listing PVC usage in namespace:  {bc.CYAN}{self.ns}{bc.ENDC}")
+                print(f"* {bc.BOLD}Listing PVC usage in namespace: {bc.CYAN}{self.ns}{bc.ENDC}")
             else:
-                print(f"* {bc.BOLD}Listing PVC usage in namespace:  {bc.CYAN}All{bc.ENDC}")
+                print(f"* {bc.BOLD}Listing PVC usage in namespace: {bc.CYAN}All{bc.ENDC}")
             for b in a:
+                pvc_sum.append(b["size"])
                 prcnt_usg = f'{self.pvc_usage(b["name"]):.2f}'
-                t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{prcnt_usg}%'])
+                if round(float((prcnt_usg))) > 80:
+                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.YELLOW}{prcnt_usg}%{bc.ENDC}'])
+                elif round(float((prcnt_usg))) > 90:
+                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.RED}{prcnt_usg}%{bc.ENDC}'])
+                else:
+                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.GREEN}{prcnt_usg}%{bc.ENDC}'])
+        size_usg = f'{round(self.list_sum(pvc_sum)/1024, 2)}Gb'
+        print(f'| Summary PVC size: {bc.GREEN}{size_usg}{bc.ENDC}')
         print(t.get_string())

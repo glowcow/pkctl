@@ -21,7 +21,12 @@ Get app help:
 ```bash
 pkctl -h
 pkctl node -h
+pkctl pvc -h
 pkctl version
+```
+List PVC usage in all namespaces (or in specific namespace [ -n <ns> ]):
+```bash
+pkctl pvc
 ```
 Listing all pods on all nodes:
 ```bash
