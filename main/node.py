@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from main.colors import bc
-from main.api import kube_api
+from main.api import KubeApi
 from prettytable import PrettyTable
 import re, sys
 
@@ -10,6 +10,9 @@ class Node:
     def __init__(self, node, sort):
         self.node = node
         self.sort = "CPU" if sort == "CPU" else "Mem(Mi)"
+        self.k8s = KubeApi()
+        self.k_client = self.k8s.kube_client_core()
+        self.k_client_c = self.k8s.kube_client_cobj()
 
     def list_sum(self, lst): #summary various metrics
         _list = []
@@ -46,7 +49,7 @@ class Node:
         n_mem_u_l = []
 
         for a in nodes:
-            node_i = kube_api.clnt.read_node(name=a)
+            node_i = self.k_client.read_node(name=a)
             n_cpu_a_ = node_i.status.allocatable.get("cpu")
             n_cpu_a_l.append(n_cpu_a_)
             n_mem_a_ = node_i.status.allocatable.get("memory")
@@ -56,14 +59,14 @@ class Node:
         mem_rl = [] #Memory request list
         err_pods = []
 
-        pods = kube_api.clnt.list_pod_for_all_namespaces(watch=False, field_selector=f_selector)
+        pods = self.k_client.list_pod_for_all_namespaces(watch=False, field_selector=f_selector)
         print(f"* {bc.BOLD}Listing usage resources on node:  {bc.CYAN}{self.node}{bc.ENDC}")
         t = PrettyTable(['Namespace', 'Pod', 'CPU', 'CPU req', 'CPU lim', 'Mem(Mi)', 'Mem req', 'Mem lim'])
 
         for i in pods.items:
             if i.status.container_statuses[0].ready == True :
                 try:
-                    usage = kube_api.clnt_c.get_namespaced_custom_object(group="metrics.k8s.io",version="v1beta1", namespace=i.metadata.namespace, plural="pods", name=i.metadata.name)
+                    usage = self.k_client_c.get_namespaced_custom_object(group="metrics.k8s.io",version="v1beta1", namespace=i.metadata.namespace, plural="pods", name=i.metadata.name)
                 except Exception as e:
                     #print(f'{bc.RED}ERROR:{bc.ENDC} {e}')
                     err_pods.append(i.metadata.name)
@@ -113,7 +116,7 @@ class Node:
         t_nmem_r_l = []
 
         print(f"* {bc.BOLD}Kubernetes cluster brief resources usage")
-        t = PrettyTable(['Node', 'Pods', 'Err Pods', 'CPU', 'CPU usg', 'CPU req', 'Mem', 'Mem usg', 'Mem req'])
+
 
         for a in nodes:
             n_cpu_u_l = [] # node usage memory list
@@ -122,18 +125,18 @@ class Node:
             mem_rl = [] # Memory request list
             err_pods = [] # Pods in error state list
 
-            node_i = kube_api.clnt.read_node(name=a)
+            node_i = self.k_client.read_node(name=a)
             n_cpu_a_ = node_i.status.allocatable.get("cpu")
             n_mem_a_ = node_i.status.allocatable.get("memory")
 
             f_selector = f'spec.nodeName={a},status.phase=Running'
-            pods = kube_api.clnt.list_pod_for_all_namespaces(watch=False, field_selector=f_selector)
+            pods = self.k_client.list_pod_for_all_namespaces(watch=False, field_selector=f_selector)
             t_pods_l.append(len(pods.items))
 
             for i in pods.items:
                 if i.status.container_statuses[0].ready == True :
                     try:
-                        usage = kube_api.clnt_c.get_namespaced_custom_object(group="metrics.k8s.io",version="v1beta1", namespace=i.metadata.namespace, plural="pods", name=i.metadata.name)
+                        usage = self.k_client_c.get_namespaced_custom_object(group="metrics.k8s.io",version="v1beta1", namespace=i.metadata.namespace, plural="pods", name=i.metadata.name)
                     except Exception as e:
                         #print(f'{bc.RED}ERROR:{bc.ENDC} {e}')
                         err_pods.append(i.metadata.name)
@@ -189,14 +192,14 @@ class Node:
         try:
             if self.node == "all" :
                 f_selector = f'status.phase=Running'
-                node_list = kube_api.clnt.list_node()
+                node_list = self.k_client.list_node()
                 nodes = []
                 for a in node_list.items:
                     n = a.metadata.name
                     nodes.append(n)
                 self.res_comp1(nodes, f_selector)
             elif self.node == "brief" :
-                node_list = kube_api.clnt.list_node()
+                node_list = self.k_client.list_node()
                 nodes = []
                 for a in node_list.items:
                     n = a.metadata.name

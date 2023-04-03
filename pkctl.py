@@ -2,7 +2,6 @@
 
 import argparse
 from main.node import Node
-from main.colors import bc
 from main.pvc import KubernetesPVCUsage
 
 version = '0.1.0'
@@ -23,17 +22,11 @@ def main():
     args = parser.parse_args()
 
     if args.command == "node":
-        try:
-            node = Node(args.node, args.sort)
-            node.resources()
-        except Exception as e:
-            print(f"{bc.RED}ERROR[main]: {e}{bc.ENDC}")
+        node = Node(args.node, args.sort)
+        node.resources()
     elif args.command == "pvc":
-        try:
-            k8s_pvc = KubernetesPVCUsage(args.namespace)
-            k8s_pvc.get_usage()
-        except Exception as e:
-            print(f"{bc.RED}ERROR[main]: {e}{bc.ENDC}")
+        pvc = KubernetesPVCUsage(args.namespace)
+        pvc.get_usage()
     elif args.command == "version":
         print(f"{25 * '-'}\nPyKubeCtl version: {version}\n{25 * '-'}")
     else:

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 
-from kubernetes import client, config
 from prettytable import PrettyTable
 from main.colors import bc
-from main.api import kube_api
+from main.api import KubeApi
 import json, subprocess, re
 
 class KubernetesPVCUsage:
     def __init__(self, namespace=None):
         self.ns = namespace
+        self.k8s = KubeApi()
+        self.k_client = self.k8s.kube_client_core()
+        self.t = PrettyTable(['PVC', 'Volume', 'Namespace', 'Status', 'SC', 'Size', 'Usage'])
 
     def list_sum(self, lst): #summary various metrics
         v_list = []
@@ -28,9 +30,9 @@ class KubernetesPVCUsage:
     def list_pvc(self):
         pvc_list = []
         if self.ns:
-            pvcs = kube_api.clnt.list_namespaced_persistent_volume_claim(self.ns)
+            pvcs = self.k_client.list_namespaced_persistent_volume_claim(self.ns)
         else:
-            pvcs = kube_api.clnt.list_persistent_volume_claim_for_all_namespaces()
+            pvcs = self.k_client.list_persistent_volume_claim_for_all_namespaces()
         for pvc in pvcs.items:
             pvc_list.append({'name': pvc.metadata.name, 'namespace':pvc.metadata.namespace, 'status': pvc.status.phase, 'sc': pvc.spec.storage_class_name, 'size': pvc.spec.resources.requests["storage"], 'volume': pvc.spec.volume_name})
         return pvc_list
@@ -39,9 +41,9 @@ class KubernetesPVCUsage:
         node_name = None
         pod_name = None
         if self.ns:
-            pods = kube_api.clnt.list_namespaced_pod(namespace=self.ns)
+            pods = self.k_client.list_namespaced_pod(namespace=self.ns)
         else:
-            pods = kube_api.clnt.list_pod_for_all_namespaces()
+            pods = self.k_client.list_pod_for_all_namespaces()
         for pod in pods.items:
             for volume in pod.spec.volumes:
                 if volume.persistent_volume_claim and volume.persistent_volume_claim.claim_name == pvc_name:
@@ -66,7 +68,6 @@ class KubernetesPVCUsage:
         return None
 
     def get_usage(self):
-        t = PrettyTable(['PVC', 'Volume', 'Namespace', 'Status', 'SC', 'Size', 'Usage'])
         a = self.list_pvc()
         pvc_sum = []
         if a is not None:
@@ -78,11 +79,11 @@ class KubernetesPVCUsage:
                 pvc_sum.append(b["size"])
                 prcnt_usg = f'{self.pvc_usage(b["name"]):.2f}'
                 if round(float((prcnt_usg))) > 80:
-                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.YELLOW}{prcnt_usg}%{bc.ENDC}'])
+                    self.t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.YELLOW}{prcnt_usg}%{bc.ENDC}'])
                 elif round(float((prcnt_usg))) > 90:
-                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.RED}{prcnt_usg}%{bc.ENDC}'])
+                    self.t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.RED}{prcnt_usg}%{bc.ENDC}'])
                 else:
-                    t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.GREEN}{prcnt_usg}%{bc.ENDC}'])
+                    self.t.add_row([b["name"], b["volume"], b["namespace"], b["status"], b["sc"], b["size"], f'{bc.GREEN}{prcnt_usg}%{bc.ENDC}'])
         size_usg = f'{round(self.list_sum(pvc_sum)/1024, 2)}Gb'
         print(f'| Summary PVC size: {bc.GREEN}{size_usg}{bc.ENDC}')
-        print(t.get_string())
+        print(self.t.get_string())

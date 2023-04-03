@@ -5,11 +5,11 @@
 
 1. Download binary
    ```bash
-   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.1/pkctl-0.5.1
+   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.1/pkctl-0.5.2
    ```
 2. Move to /usr/bin
    ```bash
-   sudo mv pkctl-0.5.1 /usr/bin/pkctl
+   sudo mv pkctl-0.5.2 /usr/bin/pkctl
    ```
 3. Allow to execute
    ```bash
@@ -26,7 +26,7 @@ pkctl version
 ```
 List PVC usage in all namespaces (or in specific namespace [ -n <ns> ]):
 ```bash
-pkctl pvc
+pkctl pvc -n monitoring
 ```
 Listing all pods on all nodes:
 ```bash
