@@ -116,7 +116,7 @@ class Node:
         t_nmem_r_l = []
 
         print(f"* {bc.BOLD}Kubernetes cluster brief resources usage")
-
+        t = PrettyTable(['Node', 'Pods', 'Err Pods', 'CPU', 'CPU usg', 'CPU req', 'Mem', 'Mem usg', 'Mem req'])
 
         for a in nodes:
             n_cpu_u_l = [] # node usage memory list
