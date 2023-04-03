@@ -5,7 +5,7 @@
 
 1. Download binary
    ```bash
-   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.1/pkctl-0.5.2
+   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.2/pkctl-0.5.2
    ```
 2. Move to /usr/bin
    ```bash
