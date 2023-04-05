@@ -14,6 +14,7 @@ class KubernetesPVCUsage:
         self.num_threads = 16
         self.k8s = KubeApi()
         self.k_client = self.k8s.kube_client_core()
+        self.k_client_a = self.k8s.kube_client_apic()
         self.t = PrettyTable(['PVC', 'Volume', 'Namespace', 'Status', 'SC', 'Size', 'Usage'])
 
     def list_sum(self, lst): #summary various metrics
@@ -50,8 +51,10 @@ class KubernetesPVCUsage:
             return pods
 
     def node_stats(self, node):
-        command = f"kubectl get --raw /api/v1/nodes/{node}/proxy/stats/summary"
-        node_stats = json.loads(subprocess.check_output(command, shell=True, text=True))
+        base_url = self.k_client_a.configuration.host
+        api_endpoint = f"/api/v1/nodes/{node}/proxy/stats/summary"
+        out = self.k_client_a.request("GET", base_url + api_endpoint,)
+        node_stats = json.loads(out.data)
         return node_stats
 
     def pvc_usage(self, pvc, pods):
@@ -93,8 +96,9 @@ class KubernetesPVCUsage:
                 print(f"* {bc.BOLD}Listing PVC usage in namespace: {bc.CYAN}All{bc.ENDC}")
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                for pvc in pvcs:
-                    executor.submit(self.pvc_usage, pvc, pods)
+                futures = [executor.submit(self.pvc_usage, pvc, pods) for pvc in pvcs]
+                for future in concurrent.futures.as_completed(futures):
+                    continue
 
         size_usg = f'{round(self.list_sum(self.pvc_sum)/1024, 2)}Gb'
         print(f'| Summary PVC size: {bc.GREEN}{size_usg}{bc.ENDC}\n| Summary PVC count: {bc.GREEN}{len(pvcs)}{bc.ENDC}')

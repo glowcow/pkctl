@@ -14,3 +14,7 @@ class KubeApi:
     def kube_client_cobj(self):
         kube_client = client.CustomObjectsApi()
         return kube_client
+
+    def kube_client_apic(self):
+        kube_client = client.ApiClient()
+        return kube_client

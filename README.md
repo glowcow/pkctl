@@ -5,11 +5,11 @@
 
 1. Download binary
    ```bash
-   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.3/pkctl-0.5.3
+   wget https://gitlab.com/api/v4/projects/38089511/packages/generic/pkctl/0.5.4/pkctl-0.5.4
    ```
 2. Move to /usr/bin
    ```bash
-   sudo mv pkctl-0.5.3 /usr/bin/pkctl
+   sudo mv pkctl-0.5.4 /usr/bin/pkctl
    ```
 3. Allow to execute
    ```bash
