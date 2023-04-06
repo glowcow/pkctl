@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 import concurrent.futures
 from main.colors import bc
 from main.api import KubeApi
-import json, subprocess, re
+import json, re
 
 class KubernetesPVCUsage:
 
@@ -99,7 +99,8 @@ class KubernetesPVCUsage:
                 futures = [executor.submit(self.pvc_usage, pvc, pods) for pvc in pvcs]
                 for future in concurrent.futures.as_completed(futures):
                     continue
-
-        size_usg = f'{round(self.list_sum(self.pvc_sum)/1024, 2)}Gb'
-        print(f'| Summary PVC size: {bc.GREEN}{size_usg}{bc.ENDC}\n| Summary PVC count: {bc.GREEN}{len(pvcs)}{bc.ENDC}')
-        print(self.t.get_string(sortby='Namespace'))
+            size_usg = f'{round(self.list_sum(self.pvc_sum)/1024, 2)}Gb'
+            print(f'| Summary PVC size: {bc.GREEN}{size_usg}{bc.ENDC}\n| Summary PVC count: {bc.GREEN}{len(pvcs)}{bc.ENDC}')
+            print(self.t.get_string(sortby='Namespace'))
+        else:
+            print(f'{bc.RED}No PVC resources found!{bc.ENDC}')
