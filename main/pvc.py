@@ -89,8 +89,8 @@ class KubernetesPVCUsage:
     def get_usage(self):
         pvcs = self.list_pvc()
         pods = self.list_pods()
-        if pvcs is not None:
-            if self.ns is not None:
+        if pvcs:
+            if self.ns:
                 print(f"* {bc.BOLD}Listing PVC usage in namespace: {bc.CYAN}{self.ns}{bc.ENDC}")
             else:
                 print(f"* {bc.BOLD}Listing PVC usage in namespace: {bc.CYAN}All{bc.ENDC}")
